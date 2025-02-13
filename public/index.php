@@ -1,5 +1,4 @@
 <?php
-
 use Slim\Factory\AppFactory;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -8,6 +7,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 $app = AppFactory::create();
 
+// Middleware para lidar com erros
 $app->addRoutingMiddleware();
 $app->addErrorMiddleware(true, true, true);
 
@@ -15,15 +15,16 @@ $app->addErrorMiddleware(true, true, true);
 $pdo = new PDO('mysql:host=db;dbname=crud_teste', 'root', 'rootpassword');
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-// Rota para listar todos os produtos (GET)
+// Rota para listar todos os produtos
 $app->get('/produtos', function (Request $request, Response $response) use ($pdo) {
     $stmt = $pdo->query('SELECT * FROM produtos');
     $produtos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     $response->getBody()->write(json_encode($produtos));
     return $response->withHeader('Content-Type', 'application/json');
 });
 
-// Rota para obter um produto específico (GET)
+// Rota para obter um produto específico
 $app->get('/produtos/{id}', function (Request $request, Response $response, $args) use ($pdo) {
     $id = $args['id'];
     $stmt = $pdo->prepare('SELECT * FROM produtos WHERE id = ?');
@@ -40,7 +41,7 @@ $app->get('/produtos/{id}', function (Request $request, Response $response, $arg
     return $response;
 });
 
-// Rota para criar um novo produto (POST)
+// Rota para criar um novo produto
 $app->post('/produtos', function (Request $request, Response $response) use ($pdo) {
     $data = json_decode($request->getBody()->getContents(), true);
     $stmt = $pdo->prepare('INSERT INTO produtos (nome, preco) VALUES (?, ?)');
@@ -51,7 +52,7 @@ $app->post('/produtos', function (Request $request, Response $response) use ($pd
     return $response;
 });
 
-// Rota para excluir um produto (DELETE)
+// Rota para excluir um produto
 $app->delete('/produtos/{id}', function (Request $request, Response $response, $args) use ($pdo) {
     $id = $args['id'];
     $stmt = $pdo->prepare('DELETE FROM produtos WHERE id = ?');
