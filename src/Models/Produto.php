@@ -5,6 +5,18 @@ namespace App\Models;
 use PDO;
 use App\Database;
 
+/**
+ * @OA\Schema(
+ *     schema="Produto",
+ *     title="Produto",
+ *     description="Modelo de Produto",
+ *     @OA\Property(property="id", type="integer", description="ID do produto"),
+ *     @OA\Property(property="nome", type="string", description="Nome do produto"),
+ *     @OA\Property(property="preco", type="number", format="float", description="Preço do produto")
+ * )
+ */
+
+
 class Produto
 {
     private $db;

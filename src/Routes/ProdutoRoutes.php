@@ -2,7 +2,7 @@
 
 namespace App\Routes;
 
-use App\Controllers\ProdutoController;
+use App\Controller\ProdutoController;
 use Slim\App;
 
 class ProdutoRoutes
