@@ -1,14 +1,10 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controllers;
 
 use App\Models\Produto;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-
-/**
- * @OA\Info(title="My First API", version="0.1")
- */
 
 /**
  * @OA\Info(
@@ -25,9 +21,19 @@ use Psr\Http\Message\ServerRequestInterface as Request;
  *     url="http://localhost:8000",
  *     description="Servidor local"
  * )
+ * 
+ * @OA\PathItem(path="/produtos")
  */
 
-
+/**
+ * @OA\Schema(
+ *     schema="Produto",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer"),
+ *     @OA\Property(property="nome", type="string"),
+ *     @OA\Property(property="preco", type="number", format="float")
+ * )
+ */
 class ProdutoController
 {
     private $produtoModel;
@@ -38,17 +44,17 @@ class ProdutoController
     }
 
     /**
- * @OA\Get(
- *     path="/produtos",
- *     summary="Lista todos os produtos",
- *     tags={"Produtos"},
- *     @OA\Response(
- *         response=200,
- *         description="Lista de produtos",
- *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Produto"))
- *     )
- * )
- */
+     * @OA\Get(
+     *     path="/produtos",
+     *     summary="Lista todos os produtos",
+     *     tags={"Produtos"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Lista de produtos",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Produto"))
+     *     )
+     * )
+     */
     public function listarProdutos(Request $request, Response $response)
     {
         $produtos = $this->produtoModel->getAll();
@@ -57,21 +63,9 @@ class ProdutoController
     }
 
     /**
- * @OA\Get(
- *     path="/produtos",
- *     summary="Lista todos os produtos",
- *     tags={"Produtos"},
- *     @OA\Response(
- *         response=200,
- *         description="Lista de produtos",
- *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Produto"))
- *     )
- * )
- */
- /**
      * @OA\Get(
      *     path="/produtos/{id}",
-     *     summary="Obtém um produto",
+     *     summary="Obtém um produto pelo ID",
      *     tags={"Produtos"},
      *     @OA\Parameter(
      *         name="id",
@@ -92,22 +86,20 @@ class ProdutoController
      */
     public function obterProduto(Request $request, Response $response, $args)
     {
-        $id = $args['id'];
+        $id = (int) $args['id'];
         $produto = $this->produtoModel->getById($id);
 
         if ($produto) {
             $response->getBody()->write(json_encode($produto));
         } else {
-            $response = $response->withStatus(404)->withHeader('Content-Type', 'application/json');
+            $response = $response->withStatus(404);
             $response->getBody()->write(json_encode(['error' => 'Produto não encontrado']));
         }
 
-        return $response;
+        return $response->withHeader('Content-Type', 'application/json');
     }
 
     /**
-     * Cria um novo produto
-     *
      * @OA\Post(
      *     path="/produtos",
      *     summary="Cria um novo produto",
@@ -130,19 +122,24 @@ class ProdutoController
     public function criarProduto(Request $request, Response $response)
     {
         $data = json_decode($request->getBody()->getContents(), true);
+
+        if (!isset($data['nome']) || !isset($data['preco'])) {
+            return $response->withStatus(400)
+                ->withHeader('Content-Type', 'application/json')
+                ->getBody()->write(json_encode(['error' => 'Campos obrigatórios: nome e preco']));
+        }
+
         $this->produtoModel->create($data['nome'], $data['preco']);
 
-        $response = $response->withStatus(201)->withHeader('Content-Type', 'application/json');
+        $response = $response->withStatus(201);
         $response->getBody()->write(json_encode(['status' => 'Produto criado com sucesso!']));
-        return $response;
+        return $response->withHeader('Content-Type', 'application/json');
     }
 
     /**
-     * Exclui um produto pelo ID
-     *
      * @OA\Delete(
      *     path="/produtos/{id}",
-     *     summary="Exclui um produto",
+     *     summary="Exclui um produto pelo ID",
      *     tags={"Produtos"},
      *     @OA\Parameter(
      *         name="id",
@@ -163,10 +160,17 @@ class ProdutoController
      */
     public function excluirProduto(Request $request, Response $response, $args)
     {
-        $id = $args['id'];
-        $this->produtoModel->delete($id);
+        $id = (int) $args['id'];
+        $produto = $this->produtoModel->getById($id);
 
+        if (!$produto) {
+            return $response->withStatus(404)
+                ->withHeader('Content-Type', 'application/json')
+                ->getBody()->write(json_encode(['error' => 'Produto não encontrado']));
+        }
+
+        $this->produtoModel->delete($id);
         $response->getBody()->write(json_encode(['status' => 'Produto deletado com sucesso!']));
-        return $response;
+        return $response->withHeader('Content-Type', 'application/json');
     }
 }

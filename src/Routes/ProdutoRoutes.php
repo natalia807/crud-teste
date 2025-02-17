@@ -2,23 +2,28 @@
 
 namespace App\Routes;
 
-use App\Controller\ProdutoController;
 use Slim\App;
+use Slim\Routing\RouteCollectorProxy;
 
-class ProdutoRoutes
-{
-    public function __construct(App $app)
-    {
-        $this->app = $app;
-    }
+return function (App $app) {
+    $app->group('/produtos', function (RouteCollectorProxy $group) {
+        $group->get('', 'App\Controllers\ProdutoController:listarProdutos');
+        $group->get('/{id}', 'App\Controllers\ProdutoController:obterProduto');
+        $group->post('', 'App\Controllers\ProdutoController:criarProduto');
+        $group->delete('/{id}', 'App\Controllers\ProdutoController:excluirProduto');
+    });
 
-    public function register()
-    {
-        $controller = new ProdutoController();
+    // Rota para servir a documentação Swagger
+    $app->get('/doc', function ($request, $response) {
+        $swaggerFile = __DIR__ . '/../../public/swagger/index.html';
 
-        $this->app->get('/produtos', [$controller, 'listarProdutos']);
-        $this->app->get('/produtos/{id}', [$controller, 'obterProduto']);
-        $this->app->post('/produtos', [$controller, 'criarProduto']);
-        $this->app->delete('/produtos/{id}', [$controller, 'excluirProduto']);
-    }
-}
+        if (!file_exists($swaggerFile)) {
+            $response->getBody()->write("Arquivo index.html não encontrado.");
+            return $response->withHeader('Content-Type', 'text/plain')->withStatus(404);
+        }
+
+        // Lendo o conteúdo do arquivo e retornando corretamente
+        $response->getBody()->write(file_get_contents($swaggerFile));
+        return $response->withHeader('Content-Type', 'text/html');
+    });
+};

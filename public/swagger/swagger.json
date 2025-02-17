@@ -1,0 +1,115 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "API de Produtos",
+      "version": "1.0.0",
+      "description": "Documentação da API de Produtos"
+    },
+    "paths": {
+      "/produtos": {
+        "get": {
+          "summary": "Lista todos os produtos",
+          "operationId": "listarProdutos",
+          "tags": ["Produtos"],
+          "responses": {
+            "200": {
+              "description": "Lista de produtos",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "integer" },
+                        "nome": { "type": "string" },
+                        "preco": { "type": "number" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "summary": "Cria um novo produto",
+          "operationId": "criarProduto",
+          "tags": ["Produtos"],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "nome": { "type": "string" },
+                    "preco": { "type": "number" }
+                  },
+                  "required": ["nome", "preco"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Produto criado com sucesso"
+            }
+          }
+        }
+      },
+      "/produtos/{id}": {
+        "get": {
+          "summary": "Obtém um produto pelo ID",
+          "operationId": "obterProduto",
+          "tags": ["Produtos"],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": { "type": "integer" }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Detalhes do produto",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "id": { "type": "integer" },
+                      "nome": { "type": "string" },
+                      "preco": { "type": "number" }
+                    }
+                  }
+                }
+              }
+            },
+            "404": { "description": "Produto não encontrado" }
+          }
+        },
+        "delete": {
+          "summary": "Exclui um produto pelo ID",
+          "operationId": "excluirProduto",
+          "tags": ["Produtos"],
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "schema": { "type": "integer" }
+            }
+          ],
+          "responses": {
+            "204": {
+              "description": "Produto excluído com sucesso"
+            },
+            "404": { "description": "Produto não encontrado" }
+          }
+        }
+      }
+    }
+  }
+  
