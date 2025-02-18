@@ -26,4 +26,10 @@ return function (App $app) {
         $response->getBody()->write(file_get_contents($swaggerFile));
         return $response->withHeader('Content-Type', 'text/html');
     });
+
+    $app->get('/', function ($request, $response) {
+        $response->getBody()->write("Bem-vindo à API!");
+        return $response->withHeader('Content-Type', 'text/plain');
+    });
+    
 };
