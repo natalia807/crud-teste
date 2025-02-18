@@ -10,21 +10,22 @@ Este é um projeto de API REST utilizando o Slim Framework para gerenciamento de
 
 📌 Como Rodar o Projeto
 
-Clone o repositório:
+1. Clone o repositório:
 
-git clone https://github.com/seu-usuario/crud-teste.git
-cd crud-teste
+    git clone https://github.com/seu-usuario/crud-teste.git
 
-Instale as dependências:
+    cd crud-teste
 
-composer install
+2. Instale as dependências:
 
-Inicie o servidor:
+    composer install
 
-php -S localhost:8000 -t public
+3. Inicie o servidor:
 
-Acesse a API:
+    php -S localhost:8000 -t public
 
-http://localhost:8000/produtos - Endpoints da API
+4. Acesse a API:
 
-http://localhost:8000/doc - Documentação Swagger
+    http://localhost:8000/produtos - Endpoints da API
+
+    http://localhost:8000/doc - Documentação Swagger
